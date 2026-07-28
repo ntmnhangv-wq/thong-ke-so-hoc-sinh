@@ -39,7 +39,7 @@
                         THỐNG KÊ HỌC SINH KHỐI 6
                         <span class="bg-blue-500/30 text-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-400/30">Hệ Thống Online</span>
                     </h1>
-                    <p class="text-xs text-slate-300 font-medium">Báo cáo tổng hợp Dịch vụ, STEM, Bán trú & Học sinh đặc biệt</p>
+                    <p class="text-xs text-slate-300 font-medium">Báo cáo chi tiết Dịch vụ, STEM theo từng Lớp & Học sinh đặc biệt</p>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
             </div>
             <div>
                 <h3 class="font-bold text-slate-800 text-base">Tải Lên File Excel Xếp Lớp Khối 6</h3>
-                <p class="text-xs text-slate-500 max-w-xl mt-1">Hệ thống tự động phân tích Môn Dịch vụ (Toán-Khoa, STEM, KNS, IC3, TAGT), Học sinh Hòa nhập và Học sinh Không đăng ký Ăn/Ngủ từ ghi chú.</p>
+                <p class="text-xs text-slate-500 max-w-xl mt-1">Hệ thống tự động phân tích Môn Dịch vụ (Toán-Khoa, STEM, KNS, IC3, TAGT) chi tiết cho TỪNG LỚP, Học sinh Hòa nhập và Học sinh Không đăng ký Ăn/Ngủ từ ghi chú.</p>
             </div>
             <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer shadow transition">
                 <i class="fa-solid fa-folder-open mr-2"></i> Chọn File Excel
@@ -157,7 +157,7 @@
                 </button>
 
                 <button onclick="switchView('view-services')" id="btn-view-services" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 transition flex items-center">
-                    <i class="fa-solid fa-layer-group mr-2"></i> Thống kê DỊCH VỤ & STEM
+                    <i class="fa-solid fa-layer-group mr-2"></i> Thống kê DỊCH VỤ theo TỪNG LỚP
                 </button>
 
                 <button onclick="switchView('view-special')" id="btn-view-special" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 transition flex items-center">
@@ -301,7 +301,6 @@
                         let ghiChuFull = `${r['Ghi chú'] || ''} ${r['Ghi chú xếp lớp'] || ''} ${r['ghi chú SĐ'] || ''}`.trim();
                         let ghiChuLower = ghiChuFull.toLowerCase();
 
-                        // Kiểm tra không ăn / không ngủ từ ghi chú
                         let khongAn = ghiChuLower.includes('không ăn') || ghiChuLower.includes('khong an');
                         let khongNgu = ghiChuLower.includes('không ngủ') || ghiChuLower.includes('khong ngu');
                         let hoaNhap = ghiChuLower.includes('hòa nhập') || ghiChuLower.includes('hoa nhap');
@@ -383,7 +382,7 @@
                 document.getElementById('current-view-title').innerText = 'Thống kê sĩ số theo LỚP';
             } else if (viewName === 'view-services') {
                 document.getElementById('btn-view-services').classList.add('active');
-                document.getElementById('current-view-title').innerText = 'Thống kê Đăng ký Dịch vụ & STEM';
+                document.getElementById('current-view-title').innerText = 'Thống kê Dịch Vụ & STEM theo TỪNG LỚP';
             } else if (viewName === 'view-special') {
                 document.getElementById('btn-view-special').classList.add('active');
                 document.getElementById('current-view-title').innerText = 'HS Hòa Nhập & Không Ăn/Ngủ';
@@ -444,46 +443,55 @@
                 renderChart('bar', labels, totals, 'Sĩ số học sinh theo từng LỚP', '#1e3a8a');
 
             } else if (currentView === 'view-services') {
-                title.innerHTML = `<i class="fa-solid fa-layer-group text-indigo-600 mr-2"></i> Báo Cáo Đăng Ký Các Môn Dịch Vụ`;
+                title.innerHTML = `<i class="fa-solid fa-layer-group text-indigo-600 mr-2"></i> Báo Cáo Môn Dịch Vụ Chi Tiết Theo TỪNG LỚP`;
                 head.innerHTML = `
                     <tr>
-                        <th class="p-2.5">Tên Môn Dịch Vụ / Chương Trình</th>
-                        <th class="p-2.5">Số HS Đăng Ký</th>
-                        <th class="p-2.5">Tỷ Lệ % Toàn Khối</th>
+                        <th class="p-2.5">LỚP</th>
+                        <th class="p-2.5">Sĩ Số</th>
+                        <th class="p-2.5 text-emerald-700">Toán - Khoa</th>
+                        <th class="p-2.5 text-teal-700">STEM</th>
+                        <th class="p-2.5 text-indigo-700">KNS</th>
+                        <th class="p-2.5 text-purple-700">IC3</th>
+                        <th class="p-2.5 text-amber-700">TAGT</th>
                     </tr>
                 `;
 
-                const total = studentsData.length || 1;
-                const services = [
-                    { name: 'Toán - Khoa Tiếng Anh', count: studentsData.filter(s => s.toanKhoa === 'x').length, color: '#10b981' },
-                    { name: 'Giáo Dục STEM', count: studentsData.filter(s => s.stem === 'x').length, color: '#06b6d4' },
-                    { name: 'Kỹ Năng Sống (KNS)', count: studentsData.filter(s => s.kns === 'x').length, color: '#8b5cf6' },
-                    { name: 'Tin Học Quốc Tế IC3', count: studentsData.filter(s => s.ic3 === 'x').length, color: '#3b82f6' },
-                    { name: 'Tiếng Anh Giao Tiếp (TAGT)', count: studentsData.filter(s => s.tagt === 'x').length, color: '#f59e0b' }
-                ];
+                const classServiceMap = {};
+                studentsData.forEach(s => {
+                    const c = s.lop || 'Chưa xếp';
+                    if (!classServiceMap[c]) classServiceMap[c] = { total: 0, toanKhoa: 0, stem: 0, kns: 0, ic3: 0, tagt: 0 };
+                    classServiceMap[c].total++;
+                    if (s.toanKhoa === 'x') classServiceMap[c].toanKhoa++;
+                    if (s.stem === 'x') classServiceMap[c].stem++;
+                    if (s.kns === 'x') classServiceMap[c].kns++;
+                    if (s.ic3 === 'x') classServiceMap[c].ic3++;
+                    if (s.tagt === 'x') classServiceMap[c].tagt++;
+                });
 
                 let html = '';
                 const labels = [];
-                const counts = [];
-                const colors = [];
+                const stemCounts = [];
 
-                services.forEach(s => {
-                    const pct = ((s.count / total) * 100).toFixed(1);
-                    labels.push(s.name);
-                    counts.push(s.count);
-                    colors.push(s.color);
+                Object.keys(classServiceMap).sort().forEach(cName => {
+                    const d = classServiceMap[cName];
+                    labels.push(cName);
+                    stemCounts.push(d.stem);
 
                     html += `
                         <tr class="hover:bg-slate-50">
-                            <td class="p-2.5 font-bold text-slate-800">${s.name}</td>
-                            <td class="p-2.5 font-black text-indigo-700 text-sm">${s.count}</td>
-                            <td class="p-2.5 font-bold text-emerald-600">${pct}%</td>
+                            <td class="p-2.5 font-bold text-blue-900">${cName}</td>
+                            <td class="p-2.5 font-black text-slate-700">${d.total}</td>
+                            <td class="p-2.5 font-bold text-emerald-600">${d.toanKhoa} <span class="text-[10px] text-slate-400 font-normal">(${((d.toanKhoa/d.total)*100).toFixed(0)}%)</span></td>
+                            <td class="p-2.5 font-bold text-teal-600">${d.stem} <span class="text-[10px] text-slate-400 font-normal">(${((d.stem/d.total)*100).toFixed(0)}%)</span></td>
+                            <td class="p-2.5 font-bold text-indigo-600">${d.kns} <span class="text-[10px] text-slate-400 font-normal">(${((d.kns/d.total)*100).toFixed(0)}%)</span></td>
+                            <td class="p-2.5 font-bold text-purple-600">${d.ic3} <span class="text-[10px] text-slate-400 font-normal">(${((d.ic3/d.total)*100).toFixed(0)}%)</span></td>
+                            <td class="p-2.5 font-bold text-amber-600">${d.tagt} <span class="text-[10px] text-slate-400 font-normal">(${((d.tagt/d.total)*100).toFixed(0)}%)</span></td>
                         </tr>
                     `;
                 });
 
                 body.innerHTML = html;
-                renderChart('bar', labels, counts, 'Số học sinh đăng ký môn dịch vụ', colors);
+                renderChart('bar', labels, stemCounts, 'Số HS đăng ký STEM theo từng Lớp', '#0d9488');
 
             } else if (currentView === 'view-special') {
                 title.innerHTML = `<i class="fa-solid fa-heart-pulse text-rose-600 mr-2"></i> Thống Kê HS Hòa Nhập & Không Đăng Ký Ăn/Ngủ`;
