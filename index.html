@@ -39,19 +39,23 @@
                         THỐNG KÊ HỌC SINH KHỐI 6
                         <span class="bg-blue-500/30 text-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-400/30">Hệ Thống Online</span>
                     </h1>
-                    <p class="text-xs text-slate-300 font-medium">Báo cáo Dịch vụ, STEM, HS Hòa Nhập & Không Ăn/Ngủ Theo Từng Lớp</p>
+                    <p class="text-xs text-slate-300 font-medium">UBND Phường Hạnh Thông - Báo cáo Dịch vụ, STEM & HS Đặc Biệt</p>
                 </div>
             </div>
 
             <!-- BUTTONS -->
-            <div class="flex items-center gap-2.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+                <button onclick="downloadTemplate()" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center transition duration-200 shadow-lg border border-slate-500/30">
+                    <i class="fa-solid fa-file-arrow-down mr-2 text-sm text-amber-400"></i> File Excel Mẫu
+                </button>
+
                 <label class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center transition duration-200 cursor-pointer shadow-lg border border-emerald-400/30">
                     <i class="fa-solid fa-file-excel mr-2 text-sm"></i> Nạp File Excel
                     <input type="file" id="excel-input" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
                 </label>
                 
                 <button onclick="exportToExcel()" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center transition duration-200 shadow-lg border border-indigo-400/30">
-                    <i class="fa-solid fa-file-export mr-2 text-sm"></i> Xuất Báo Cáo
+                    <i class="fa-solid fa-file-export mr-2 text-sm"></i> Xuất Báo Cáo A4
                 </button>
             </div>
 
@@ -70,15 +74,19 @@
                 <h3 class="font-bold text-slate-800 text-base">Tải Lên File Excel Xếp Lớp Khối 6</h3>
                 <p class="text-xs text-slate-500 max-w-xl mt-1">Hệ thống tự động phân tích Môn Dịch vụ (Toán-Khoa, STEM, KNS, IC3, TAGT), HS Hòa Nhập và Không Ăn/Ngủ chi tiết cho TỪNG LỚP.</p>
             </div>
-            <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer shadow transition">
-                <i class="fa-solid fa-folder-open mr-2"></i> Chọn File Excel
-                <input type="file" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
-            </label>
+            <div class="flex items-center gap-3">
+                <button onclick="downloadTemplate()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition">
+                    <i class="fa-solid fa-download text-amber-500 mr-2"></i> Tải Mẫu File Excel
+                </button>
+                <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer shadow transition">
+                    <i class="fa-solid fa-folder-open mr-2"></i> Chọn File Dữ Liệu
+                    <input type="file" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
+                </label>
+            </div>
         </div>
 
         <!-- 1. CARDS KPI TỔNG QUAN -->
         <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-            
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div class="flex justify-between items-center text-slate-400">
                     <span class="text-[11px] font-extrabold uppercase">Tổng Học Sinh</span>
@@ -144,7 +152,6 @@
                     <span class="text-[11px] text-amber-600 font-bold block">HS Không ăn ngủ BT</span>
                 </div>
             </div>
-
         </section>
 
         <!-- 2. THANH CHỌN CHẾ ĐỘ THỐNG KÊ -->
@@ -168,8 +175,6 @@
 
         <!-- 3. BIỂU ĐỒ VÀ BẢNG THỐNG KÊ CHI TIẾT -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <!-- CHART -->
             <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center">
@@ -181,7 +186,6 @@
                 </div>
             </div>
 
-            <!-- TABLE -->
             <div class="lg:col-span-8 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-center mb-3">
                     <h3 id="summary-table-title" class="font-bold text-slate-800 text-sm flex items-center">
@@ -200,17 +204,15 @@
                     </table>
                 </div>
             </div>
-
         </section>
 
         <!-- 4. DANH SÁCH TRA CỨU HỌC SINH -->
         <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            
             <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap justify-between items-center gap-3">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-id-card text-blue-700 text-base"></i>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm">Danh Sách Tra Cứu Học Sinh Sheet "Xep lop"</h3>
+                        <h3 class="font-bold text-slate-800 text-sm">Danh Sách Tra Cứu Học Sinh</h3>
                         <p class="text-[11px] text-slate-500">Tra cứu thông tin chi tiết từng học sinh</p>
                     </div>
                 </div>
@@ -238,13 +240,13 @@
                     <thead>
                         <tr class="bg-slate-100 text-slate-600 uppercase font-bold text-[10px] sticky top-0 z-10 shadow-sm">
                             <th class="p-3">STT</th>
-                            <th class="p-3">Họ, chữ lót</th>
-                            <th class="p-3">Tên</th>
+                            <th class="p-3">Họ và Tên</th>
                             <th class="p-3">Giới tính</th>
+                            <th class="p-3">Ngày sinh</th>
                             <th class="p-3">LỚP</th>
                             <th class="p-3">Loại hình</th>
                             <th class="p-3">Môn Dịch Vụ Đăng Ký</th>
-                            <th class="p-3">Ghi chú xếp lớp</th>
+                            <th class="p-3">Ghi chú</th>
                         </tr>
                     </thead>
                     <tbody id="student-list-body" class="divide-y divide-slate-100">
@@ -255,14 +257,13 @@
             <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500 font-semibold">
                 <span>Đang hiển thị <strong id="showing-records" class="text-blue-900 font-extrabold">0</strong> / <strong id="total-records" class="text-slate-800">0</strong> học sinh</span>
             </div>
-
         </section>
 
     </main>
 
     <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs border-t border-slate-800 mt-auto">
-        <p class="font-medium">Hệ Thống Thống Kê Tuyển Sinh Khối 6 &copy; 2026</p>
+        <p class="font-medium">UBND Phường Hạnh Thông - Hệ Thống Thống Kê Tuyển Sinh Khối 6 &copy; 2026</p>
     </footer>
 
     <!-- JAVASCRIPT LOGIC -->
@@ -272,6 +273,63 @@
         let currentView = 'view-class';
         let chartInstance = null;
 
+        // 1. TẢI FILE EXCEL MẪU
+        function downloadTemplate() {
+            const templateData = [
+                {
+                    "STT": 1,
+                    "Họ Tên": "Nguyễn Văn An",
+                    "Giới tính": "Nam",
+                    "Ngày sinh": "15/05/2014",
+                    "Lớp": "6A1",
+                    "Loại hình lớp": "Bán trú",
+                    "Toán - Khoa": "x",
+                    "KNS": "x",
+                    "STEM": "x",
+                    "TAGT": "",
+                    "IC3": "x",
+                    "Ghi chú": ""
+                },
+                {
+                    "STT": 2,
+                    "Họ Tên": "Trần Thị Bình",
+                    "Giới tính": "Nữ",
+                    "Ngày sinh": "20/08/2014",
+                    "Lớp": "6A1",
+                    "Loại hình lớp": "Bán trú",
+                    "Toán - Khoa": "",
+                    "KNS": "x",
+                    "STEM": "x",
+                    "TAGT": "x",
+                    "IC3": "",
+                    "Ghi chú": "Không ăn ngủ BT, Học hòa nhập"
+                }
+            ];
+
+            const ws = XLSX.utils.json_to_sheet(templateData);
+            
+            // Chỉnh độ rộng cột mẫu
+            ws['!cols'] = [
+                { wch: 6 },  // STT
+                { wch: 22 }, // Họ Tên
+                { wch: 10 }, // Giới tính
+                { wch: 12 }, // Ngày sinh
+                { wch: 8 },  // Lớp
+                { wch: 14 }, // Loại hình lớp
+                { wch: 12 }, // Toán - Khoa
+                { wch: 8 },  // KNS
+                { wch: 8 },  // STEM
+                { wch: 8 },  // TAGT
+                { wch: 8 },  // IC3
+                { wch: 30 }  // Ghi chú
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Danh_Sach_Mau");
+            XLSX.writeFile(wb, "File_Mau_Nhap_Hoc_Sinh_Khoi_6.xlsx");
+        }
+
+        // 2. XỬ LÝ ĐỌC FILE EXCEL ĐƯỢC TẢI LÊN
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -282,19 +340,19 @@
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     
-                    let sheetName = workbook.SheetNames.find(s => s.trim().toLowerCase() === 'xep lop') || workbook.SheetNames[0];
+                    let sheetName = workbook.SheetNames.find(s => s.trim().toLowerCase().includes('xep') || s.trim().toLowerCase().includes('danh')) || workbook.SheetNames[0];
                     const sheet = workbook.Sheets[sheetName];
                     const jsonRows = XLSX.utils.sheet_to_json(sheet);
 
                     studentsData = [];
                     jsonRows.forEach((r, idx) => {
-                        let ho = r['Họ, chữ lót'] || r['Họ'] || '';
-                        let ten = r['Tên'] || '';
-                        if (!ho && !ten && !r['STT']) return;
+                        let hoTen = r['Họ Tên'] || r['Họ và tên'] || `${r['Họ, chữ lót'] || r['Họ'] || ''} ${r['Tên'] || ''}`.trim();
+                        if (!hoTen && !r['STT']) return;
 
                         let gioiTinh = String(r['Giới tính'] || '').trim();
-                        let lop = String(r['LỚP'] || r['Lớp'] || 'Chưa xếp').trim();
-                        let loaiHinh = String(r['Loại hình lớp học'] || r['Loại hình lớp'] || 'Bán trú').trim();
+                        let ngaySinh = String(r['Ngày sinh'] || '').trim();
+                        let lop = String(r['Lớp'] || r['LỚP'] || 'Chưa xếp').trim();
+                        let loaiHinh = String(r['Loại hình lớp'] || r['Loại hình lớp học'] || 'Bán trú').trim();
                         
                         let ghiChuFull = `${r['Ghi chú'] || ''} ${r['Ghi chú xếp lớp'] || ''} ${r['ghi chú SĐ'] || ''}`.trim();
                         let ghiChuLower = ghiChuFull.toLowerCase();
@@ -305,19 +363,18 @@
 
                         studentsData.push({
                             stt: r['STT'] || idx + 1,
-                            ho: ho,
-                            ten: ten,
-                            hoTen: `${ho} ${ten}`.trim(),
+                            hoTen: hoTen,
                             gioiTinh: gioiTinh,
+                            ngaySinh: ngaySinh,
                             lop: lop,
                             loaiHinh: loaiHinh,
-                            toanKhoa: String(r['Toán Khoa tiếng Anh'] || '').toLowerCase().includes('x') ? 'x' : '',
-                            tagt: String(r['Tiếng Anh giao tiếp'] || '').toLowerCase().includes('x') ? 'x' : '',
-                            ic3: String(r['Tin học quốc tế IC3'] || '').toLowerCase().includes('x') ? 'x' : '',
-                            kns: String(r['Kỹ năng sống'] || '').toLowerCase().includes('x') ? 'x' : '',
-                            stem: String(r['Giáo dục Stem'] || '').toLowerCase().includes('x') ? 'x' : '',
+                            toanKhoa: String(r['Toán - Khoa'] || r['Toán Khoa tiếng Anh'] || '').toLowerCase().includes('x') ? 'x' : '',
+                            tagt: String(r['TAGT'] || r['Tiếng Anh giao tiếp'] || '').toLowerCase().includes('x') ? 'x' : '',
+                            ic3: String(r['IC3'] || r['Tin học quốc tế IC3'] || '').toLowerCase().includes('x') ? 'x' : '',
+                            kns: String(r['KNS'] || r['Kỹ năng sống'] || '').toLowerCase().includes('x') ? 'x' : '',
+                            stem: String(r['STEM'] || r['Giáo dục Stem'] || '').toLowerCase().includes('x') ? 'x' : '',
                             hoaNhap: hoaNhap,
-                            khongAnNgu: khongAn || khongNgu, // Đếm chung HS không ăn/ngủ BT
+                            khongAnNgu: khongAn || khongNgu,
                             ghiChu: ghiChuFull || 'Không'
                         });
                     });
@@ -328,7 +385,7 @@
 
                     Swal.fire({
                         title: 'Đã Thống Kê Xong!',
-                        text: `Đã nạp thành công ${studentsData.length} học sinh từ sheet "${sheetName}".`,
+                        text: `Đã nạp thành công ${studentsData.length} học sinh từ file Excel.`,
                         icon: 'success',
                         confirmButtonColor: '#10b981'
                     });
@@ -445,7 +502,6 @@
 
                 body.innerHTML = html;
 
-                // Dòng TỔNG CỘNG
                 foot.innerHTML = `
                     <tr>
                         <td class="p-2.5 text-blue-950 uppercase font-black">TỔNG CỘNG</td>
@@ -471,7 +527,7 @@
                         <th class="p-2.5 text-purple-700">IC3</th>
                         <th class="p-2.5 text-amber-700">TAGT</th>
                         <th class="p-2.5 text-rose-700 bg-rose-50">Hòa Nhập</th>
-                        <th class="p-2.5 text-orange-700 bg-orange-50">Không Ăn / Ngủ</th>
+                        <th class="p-2.5 text-orange-700 bg-orange-50">Không Ăn/Ngủ</th>
                     </tr>
                 `;
 
@@ -511,7 +567,6 @@
                             <td class="p-2.5 font-bold text-purple-600">${d.ic3} <span class="text-[10px] text-slate-400 font-normal">(${((d.ic3/d.total)*100).toFixed(0)}%)</span></td>
                             <td class="p-2.5 font-bold text-amber-600">${d.tagt} <span class="text-[10px] text-slate-400 font-normal">(${((d.tagt/d.total)*100).toFixed(0)}%)</span></td>
                             <td class="p-2.5 font-bold text-rose-600 bg-rose-50/50">${d.hoaNhap > 0 ? d.hoaNhap : '-'}</td>
-                            <!-- Bỏ hoàn toàn dấu / và chữ ăn/ngủ, chỉ hiển thị số lượng cụ thể -->
                             <td class="p-2.5 font-bold text-orange-600 bg-orange-50/50">${d.khongAnNgu > 0 ? d.khongAnNgu : '-'}</td>
                         </tr>
                     `;
@@ -519,7 +574,6 @@
 
                 body.innerHTML = html;
 
-                // Dòng TỔNG CỘNG
                 foot.innerHTML = `
                     <tr>
                         <td class="p-2.5 text-blue-950 uppercase font-black">TỔNG CỘNG</td>
@@ -589,9 +643,9 @@
                 return `
                     <tr class="hover:bg-blue-50/40 transition ${isSpecial ? 'bg-amber-50/60' : ''}">
                         <td class="p-3 font-semibold text-slate-500">${s.stt}</td>
-                        <td class="p-3 font-medium text-slate-700">${s.ho}</td>
-                        <td class="p-3 font-extrabold text-blue-900">${s.ten}</td>
+                        <td class="p-3 font-extrabold text-blue-900">${s.hoTen}</td>
                         <td class="p-3">${s.gioiTinh === 'Nam' ? '<span class="text-blue-600 font-bold">Nam</span>' : '<span class="text-pink-600 font-bold">Nữ</span>'}</td>
+                        <td class="p-3 font-medium text-slate-600">${s.ngaySinh || '-'}</td>
                         <td class="p-3 font-bold text-blue-700">${s.lop}</td>
                         <td class="p-3 font-medium text-slate-600">${s.loaiHinh}</td>
                         <td class="p-3 space-x-1">
@@ -623,16 +677,124 @@
             renderStudentTable();
         }
 
+        // 3. XUẤT BÁO CÁO EXCEL NHIỀU SHEET + CẤU HÌNH TRANG IN A4 ĐỨNG (PORTRAIT)
         function exportToExcel() {
             if (studentsData.length === 0) {
-                Swal.fire('Thông báo', 'Chưa có dữ liệu để xuất file!', 'warning');
+                Swal.fire('Thông báo', 'Chưa có dữ liệu để xuất báo cáo!', 'warning');
                 return;
             }
 
-            const ws = XLSX.utils.json_to_sheet(studentsData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "BaoCao_Khoi6");
-            XLSX.writeFile(wb, "Bao_Cao_Thong_Ke_Khoi_6.xlsx");
+            const today = new Date();
+            const dateStr = `Hạnh Thông, ngày ${today.getDate()} tháng ${today.getMonth() + 1} năm ${today.getFullYear()}`;
+
+            // --- SHEET 1: THỐNG KÊ TỔNG HỢP THEO LỚP ---
+            const classServiceMap = {};
+            let sumTotal = 0, sumToanKhoa = 0, sumStem = 0, sumKns = 0, sumIc3 = 0, sumTagt = 0, sumHoaNhap = 0, sumKhongAnNgu = 0;
+
+            studentsData.forEach(s => {
+                const c = s.lop || 'Chưa xếp';
+                if (!classServiceMap[c]) classServiceMap[c] = { total: 0, toanKhoa: 0, stem: 0, kns: 0, ic3: 0, tagt: 0, hoaNhap: 0, khongAnNgu: 0 };
+                
+                classServiceMap[c].total++; sumTotal++;
+                if (s.toanKhoa === 'x') { classServiceMap[c].toanKhoa++; sumToanKhoa++; }
+                if (s.stem === 'x') { classServiceMap[c].stem++; sumStem++; }
+                if (s.kns === 'x') { classServiceMap[c].kns++; sumKns++; }
+                if (s.ic3 === 'x') { classServiceMap[c].ic3++; sumIc3++; }
+                if (s.tagt === 'x') { classServiceMap[c].tagt++; sumTagt++; }
+                if (s.hoaNhap) { classServiceMap[c].hoaNhap++; sumHoaNhap++; }
+                if (s.khongAnNgu) { classServiceMap[c].khongAnNgu++; sumKhongAnNgu++; }
+            });
+
+            const sheet1Rows = [
+                ["UBND PHƯỜNG HẠNH THÔNG", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
+                ["TRƯỜNG THCS ...", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
+                ["", "", "", "", dateStr],
+                [""],
+                ["BÁO CÁO THỐNG KÊ DỊCH VỤ, STEM VÀ SĨ SỐ HỌC SINH KHỐI 6"],
+                [""],
+                ["STT", "Lớp", "Sĩ số", "Toán - Khoa", "STEM", "KNS", "IC3", "TAGT", "Hòa Nhập", "Không Ăn/Ngủ BT"]
+            ];
+
+            let sttCount = 1;
+            Object.keys(classServiceMap).sort().forEach(cName => {
+                const d = classServiceMap[cName];
+                sheet1Rows.push([
+                    sttCount++,
+                    cName,
+                    d.total,
+                    d.toanKhoa,
+                    d.stem,
+                    d.kns,
+                    d.ic3,
+                    d.tagt,
+                    d.hoaNhap,
+                    d.khongAnNgu
+                ]);
+            });
+
+            sheet1Rows.push(["", "TỔNG CỘNG", sumTotal, sumToanKhoa, sumStem, sumKns, sumIc3, sumTagt, sumHoaNhap, sumKhongAnNgu]);
+
+            const ws1 = XLSX.utils.aoa_to_sheet(sheet1Rows);
+
+            // --- SHEET 2: DANH SÁCH CHI TIẾT HỌC SINH ---
+            const sheet2Rows = [
+                ["UBND PHƯỜNG HẠNH THÔNG", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
+                ["TRƯỜNG THCS ...", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
+                ["", "", "", "", dateStr],
+                [""],
+                ["DANH SÁCH CHI TIẾT HỌC SINH ĐĂNG KÝ DỊCH VỤ KHỐI 6"],
+                [""],
+                ["STT", "Họ và Tên", "Giới tính", "Ngày sinh", "Lớp", "Loại hình lớp", "Toán - Khoa", "KNS", "STEM", "TAGT", "IC3", "Ghi chú"]
+            ];
+
+            studentsData.forEach((s, i) => {
+                sheet2Rows.push([
+                    i + 1,
+                    s.hoTen,
+                    s.gioiTinh,
+                    s.ngaySinh,
+                    s.lop,
+                    s.loaiHinh,
+                    s.toanKhoa,
+                    s.kns,
+                    s.stem,
+                    s.tagt,
+                    s.ic3,
+                    s.ghiChu
+                ]);
+            });
+
+            const ws2 = XLSX.utils.aoa_to_sheet(sheet2Rows);
+
+            // Cấu hình Căn Trang In A4 Đứng (Portrait) & Lề In cho CẢ 2 SHEET
+            [ws1, ws2].forEach(ws => {
+                ws['!pageSetup'] = {
+                    paperSize: 9,         // A4
+                    orientation: 'portrait', // Trang Đứng
+                    scale: 100,
+                    fitToWidth: 1,        // Căn vừa chiều ngang A4
+                    fitToHeight: 0
+                };
+                ws['!margins'] = { left: 0.5, right: 0.5, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+            });
+
+            // Chỉnh độ rộng cột Sheet 1
+            ws1['!cols'] = [
+                { wch: 5 }, { wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 16 }
+            ];
+
+            // Chỉnh độ rộng cột Sheet 2
+            ws2['!cols'] = [
+                { wch: 5 }, { wch: 22 }, { wch: 9 }, { wch: 12 }, { wch: 8 }, { wch: 14 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 25 }
+            ];
+
+            // Thêm các Sheet vào Workbook
+            XLSX.utils.book_append_sheet(wb, ws1, "Thong_Ke_Tong_Hop");
+            XLSX.utils.book_append_sheet(wb, ws2, "Danh_Sach_Chi_Tiet");
+
+            // Xuất File Excel
+            XLSX.writeFile(wb, "Bao_Cao_Thong_Ke_Khoi_6_A4.xlsx");
         }
     </script>
 </body>
