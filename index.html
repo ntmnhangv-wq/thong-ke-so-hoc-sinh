@@ -10,7 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (xlsx) CDN -->
+    <!-- ExcelJS & FileSaver cho phép định dạng Border, Font, Alignment, Merge trong Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- SheetJS (xlsx) để đọc file upload -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -37,9 +40,9 @@
                 <div>
                     <h1 class="font-extrabold text-xl tracking-tight text-white flex items-center gap-2">
                         THỐNG KÊ HỌC SINH KHỐI 6
-                        <span class="bg-blue-500/30 text-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-400/30">Hệ Thống Online</span>
+                        <span class="bg-blue-500/30 text-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-400/30">Quản Lý Tuyển Sinh</span>
                     </h1>
-                    <p class="text-xs text-slate-300 font-medium">UBND Phường Hạnh Thông - Báo cáo Dịch vụ, STEM & HS Đặc Biệt</p>
+                    <p class="text-xs text-slate-300 font-medium">Hệ thống Thống kê Dịch vụ, STEM, Bán Trú & Học sinh Hòa Nhập</p>
                 </div>
             </div>
 
@@ -54,8 +57,8 @@
                     <input type="file" id="excel-input" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
                 </label>
                 
-                <button onclick="exportToExcel()" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center transition duration-200 shadow-lg border border-indigo-400/30">
-                    <i class="fa-solid fa-file-export mr-2 text-sm"></i> Xuất Báo Cáo A4
+                <button onclick="exportToExcelPro()" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center transition duration-200 shadow-lg border border-indigo-400/30">
+                    <i class="fa-solid fa-file-export mr-2 text-sm"></i> Xuất Báo Cáo A4 Chuẩn
                 </button>
             </div>
 
@@ -71,8 +74,8 @@
                 <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
             </div>
             <div>
-                <h3 class="font-bold text-slate-800 text-base">Tải Lên File Excel Xếp Lớp Khối 6</h3>
-                <p class="text-xs text-slate-500 max-w-xl mt-1">Hệ thống tự động phân tích Môn Dịch vụ (Toán-Khoa, STEM, KNS, IC3, TAGT), HS Hòa Nhập và Không Ăn/Ngủ chi tiết cho TỪNG LỚP.</p>
+                <h3 class="font-bold text-slate-800 text-base">Tải Lên File Excel Dữ Liệu Học Sinh Khối 6</h3>
+                <p class="text-xs text-slate-500 max-w-xl mt-1">Hệ thống tự động sắp xếp tên ABC, phân tích Môn Dịch vụ (Toán-Khoa, STEM, KNS, IC3, TAGT), HS Hòa Nhập và Không Ăn/Ngủ chi tiết cho TỪNG LỚP.</p>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="downloadTemplate()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition">
@@ -212,7 +215,7 @@
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-id-card text-blue-700 text-base"></i>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm">Danh Sách Tra Cứu Học Sinh</h3>
+                        <h3 class="font-bold text-slate-800 text-sm">Danh Sách Tra Cứu Học Sinh (Đã xếp Tên -> Họ ABC)</h3>
                         <p class="text-[11px] text-slate-500">Tra cứu thông tin chi tiết từng học sinh</p>
                     </div>
                 </div>
@@ -263,7 +266,7 @@
 
     <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs border-t border-slate-800 mt-auto">
-        <p class="font-medium">UBND Phường Hạnh Thông - Hệ Thống Thống Kê Tuyển Sinh Khối 6 &copy; 2026</p>
+        <p class="font-medium">Hệ Thống Thống Kê & Quản Lý Tuyển Sinh Khối 6 &copy; 2026</p>
     </footer>
 
     <!-- JAVASCRIPT LOGIC -->
@@ -272,6 +275,43 @@
         let filteredStudents = [];
         let currentView = 'view-class';
         let chartInstance = null;
+
+        // BÓC TÁCH TÊN VÀ HỌ ĐỂ SẮP XẾP CHUẨN ABC TIẾNG VIỆT
+        function splitName(fullName) {
+            const trimmed = (fullName || '').trim().replace(/\s+/g, ' ');
+            if (!trimmed) return { firstName: '', lastName: '' };
+            const lastSpaceIndex = trimmed.lastIndexOf(' ');
+            if (lastSpaceIndex === -1) {
+                return { firstName: trimmed, lastName: '' };
+            }
+            const lastName = trimmed.substring(0, lastSpaceIndex);
+            const firstName = trimmed.substring(lastSpaceIndex + 1);
+            return { firstName, lastName };
+        }
+
+        // TỰ ĐỘNG CHUẨN HÓA NGÀY SINH VỀ dd/mm/yyyy
+        function formatDateStandard(dateVal) {
+            if (!dateVal) return '';
+            if (typeof dateVal === 'number') {
+                const dateObj = XLSX.SSF.parse_date_code(dateVal);
+                if (dateObj) {
+                    const d = String(dateObj.d).padStart(2, '0');
+                    const m = String(dateObj.m).padStart(2, '0');
+                    return `${d}/${m}/${dateObj.y}`;
+                }
+            }
+            let str = String(dateVal).trim();
+            str = str.replace(/[-.]/g, '/');
+            const parts = str.split('/');
+            if (parts.length === 3) {
+                let d = parts[0].padStart(2, '0');
+                let m = parts[1].padStart(2, '0');
+                let y = parts[2];
+                if (d.length === 4) return `${y.padStart(2, '0')}/${m}/${d}`; // yyyy/mm/dd
+                return `${d}/${m}/${y}`;
+            }
+            return str;
+        }
 
         // 1. TẢI FILE EXCEL MẪU
         function downloadTemplate() {
@@ -307,21 +347,9 @@
             ];
 
             const ws = XLSX.utils.json_to_sheet(templateData);
-            
-            // Chỉnh độ rộng cột mẫu
             ws['!cols'] = [
-                { wch: 6 },  // STT
-                { wch: 22 }, // Họ Tên
-                { wch: 10 }, // Giới tính
-                { wch: 12 }, // Ngày sinh
-                { wch: 8 },  // Lớp
-                { wch: 14 }, // Loại hình lớp
-                { wch: 12 }, // Toán - Khoa
-                { wch: 8 },  // KNS
-                { wch: 8 },  // STEM
-                { wch: 8 },  // TAGT
-                { wch: 8 },  // IC3
-                { wch: 30 }  // Ghi chú
+                { wch: 6 }, { wch: 22 }, { wch: 10 }, { wch: 12 }, { wch: 8 },
+                { wch: 14 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 30 }
             ];
 
             const wb = XLSX.utils.book_new();
@@ -338,11 +366,11 @@
             reader.onload = function(evt) {
                 try {
                     const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
                     
                     let sheetName = workbook.SheetNames.find(s => s.trim().toLowerCase().includes('xep') || s.trim().toLowerCase().includes('danh')) || workbook.SheetNames[0];
                     const sheet = workbook.Sheets[sheetName];
-                    const jsonRows = XLSX.utils.sheet_to_json(sheet);
+                    const jsonRows = XLSX.utils.sheet_to_json(sheet, { raw: false });
 
                     studentsData = [];
                     jsonRows.forEach((r, idx) => {
@@ -350,7 +378,7 @@
                         if (!hoTen && !r['STT']) return;
 
                         let gioiTinh = String(r['Giới tính'] || '').trim();
-                        let ngaySinh = String(r['Ngày sinh'] || '').trim();
+                        let ngaySinh = formatDateStandard(r['Ngày sinh']);
                         let lop = String(r['Lớp'] || r['LỚP'] || 'Chưa xếp').trim();
                         let loaiHinh = String(r['Loại hình lớp'] || r['Loại hình lớp học'] || 'Bán trú').trim();
                         
@@ -361,9 +389,13 @@
                         let khongNgu = ghiChuLower.includes('không ngủ') || ghiChuLower.includes('khong ngu');
                         let hoaNhap = ghiChuLower.includes('hòa nhập') || ghiChuLower.includes('hoa nhap');
 
+                        const { firstName, lastName } = splitName(hoTen);
+
                         studentsData.push({
                             stt: r['STT'] || idx + 1,
                             hoTen: hoTen,
+                            firstName: firstName,
+                            lastName: lastName,
                             gioiTinh: gioiTinh,
                             ngaySinh: ngaySinh,
                             lop: lop,
@@ -375,7 +407,7 @@
                             stem: String(r['STEM'] || r['Giáo dục Stem'] || '').toLowerCase().includes('x') ? 'x' : '',
                             hoaNhap: hoaNhap,
                             khongAnNgu: khongAn || khongNgu,
-                            ghiChu: ghiChuFull || 'Không'
+                            ghiChu: ghiChuFull || ''
                         });
                     });
 
@@ -384,7 +416,7 @@
                     updateAllDashboards();
 
                     Swal.fire({
-                        title: 'Đã Thống Kê Xong!',
+                        title: 'Thành Công!',
                         text: `Đã nạp thành công ${studentsData.length} học sinh từ file Excel.`,
                         icon: 'success',
                         confirmButtonColor: '#10b981'
@@ -400,7 +432,7 @@
         function updateAllDashboards() {
             renderKPICards();
             renderMainView();
-            renderStudentTable();
+            applyStudentFilters();
         }
 
         function renderKPICards() {
@@ -466,8 +498,7 @@
                 studentsData.forEach(s => {
                     const c = s.lop || 'Chưa xếp';
                     if (!classMap[c]) classMap[c] = { total: 0, nam: 0, nu: 0, bantru: 0, khongbantru: 0 };
-                    classMap[c].total++;
-                    sumTotal++;
+                    classMap[c].total++; sumTotal++;
 
                     if (s.gioiTinh === 'Nam') { classMap[c].nam++; sumNam++; } 
                     else { classMap[c].nu++; sumNu++; }
@@ -637,12 +668,12 @@
                 return;
             }
 
-            tbody.innerHTML = filteredStudents.map(s => {
+            tbody.innerHTML = filteredStudents.map((s, idx) => {
                 const isSpecial = s.hoaNhap || s.khongAnNgu;
                 
                 return `
                     <tr class="hover:bg-blue-50/40 transition ${isSpecial ? 'bg-amber-50/60' : ''}">
-                        <td class="p-3 font-semibold text-slate-500">${s.stt}</td>
+                        <td class="p-3 font-semibold text-slate-500">${idx + 1}</td>
                         <td class="p-3 font-extrabold text-blue-900">${s.hoTen}</td>
                         <td class="p-3">${s.gioiTinh === 'Nam' ? '<span class="text-blue-600 font-bold">Nam</span>' : '<span class="text-pink-600 font-bold">Nữ</span>'}</td>
                         <td class="p-3 font-medium text-slate-600">${s.ngaySinh || '-'}</td>
@@ -674,28 +705,122 @@
                 return matchKw && matchCls && matchGen;
             });
 
+            // SẮP XẾP HỌC SINH THEO TÊN -> HỌ (ABC TIẾNG VIỆT)
+            filteredStudents.sort((a, b) => {
+                const cmpFirstName = a.firstName.localeCompare(b.firstName, 'vi', { sensitivity: 'base' });
+                if (cmpFirstName !== 0) return cmpFirstName;
+                return a.lastName.localeCompare(b.lastName, 'vi', { sensitivity: 'base' });
+            });
+
             renderStudentTable();
         }
 
-        // 3. XUẤT BÁO CÁO EXCEL NHIỀU SHEET + CẤU HÌNH TRANG IN A4 ĐỨNG (PORTRAIT)
-        function exportToExcel() {
+        // 3. XUẤT BÁO CÁO EXCEL CHUẨN THỂ THỨC VĂN BẢN (UBND PHƯỜNG HẠNH THÔNG / TRƯỜNG THCS GÒ VẤP)
+        async function exportToExcelPro() {
             if (studentsData.length === 0) {
                 Swal.fire('Thông báo', 'Chưa có dữ liệu để xuất báo cáo!', 'warning');
                 return;
             }
 
-            const wb = XLSX.utils.book_new();
+            const workbook = new ExcelJS.Workbook();
             const today = new Date();
-            const dateStr = `Hạnh Thông, ngày ${today.getDate()} tháng ${today.getMonth() + 1} năm ${today.getFullYear()}`;
+            const dateStr = `Ngày ${today.getDate()} tháng ${today.getMonth() + 1} năm ${today.getFullYear()}`;
 
-            // --- SHEET 1: THỐNG KÊ TỔNG HỢP THEO LỚP ---
+            // Định dạng Border chuẩn cho ô Bảng
+            const thinBorder = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+
+            // Font chuẩn Times New Roman
+            const fontHeaderLeftNormal = { name: 'Times New Roman', size: 12 };
+            const fontHeaderLeftBold = { name: 'Times New Roman', size: 12, bold: true };
+            const fontBody = { name: 'Times New Roman', size: 12 };
+            const fontBold = { name: 'Times New Roman', size: 12, bold: true };
+
+            // Cấu hình trang in A4 Đứng chuẩn
+            function setupSheetA4(ws) {
+                ws.pageSetup = {
+                    paperSize: 9, // A4
+                    orientation: 'portrait',
+                    fitToPage: true,
+                    fitToWidth: 1,
+                    fitToHeight: 0
+                };
+                ws.pageSetup.margins = { left: 0.5, right: 0.5, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+            }
+
+            // === 3.1 SHEET 1: THỐNG KÊ TỔNG HỢP THEO LỚP ===
+            const wsSummary = workbook.addWorksheet("Thong_Ke_Tong_Hop");
+            setupSheetA4(wsSummary);
+
+            // Độ rộng các cột Sheet Tổng Hợp
+            wsSummary.columns = [
+                { width: 6 },  // A: STT
+                { width: 10 }, // B: Lớp
+                { width: 10 }, // C: Sĩ số
+                { width: 14 }, // D: Toán - Khoa
+                { width: 10 }, // E: STEM
+                { width: 10 }, // F: KNS
+                { width: 10 }, // G: IC3
+                { width: 10 }, // H: TAGT
+                { width: 14 }, // I: Hòa nhập
+                { width: 22 }  // J: Không ăn/ngủ BT
+            ];
+
+            // Header Hành chính thể thức - Góc Trái Giữ Nguyên Cơ quan
+            wsSummary.mergeCells('A1:C1');
+            wsSummary.getCell('A1').value = "UBND PHƯỜNG HẠNH THÔNG";
+            wsSummary.getCell('A1').font = fontHeaderLeftNormal;
+            wsSummary.getCell('A1').alignment = { horizontal: 'center' };
+
+            wsSummary.mergeCells('A2:C2');
+            wsSummary.getCell('A2').value = "TRƯỜNG THCS GÒ VẤP";
+            wsSummary.getCell('A2').font = fontHeaderLeftBold;
+            wsSummary.getCell('A2').alignment = { horizontal: 'center' };
+
+            // Header Hành chính - Góc Phải
+            wsSummary.mergeCells('D1:J1');
+            wsSummary.getCell('D1').value = "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM";
+            wsSummary.getCell('D1').font = fontBold;
+            wsSummary.getCell('D1').alignment = { horizontal: 'center' };
+
+            wsSummary.mergeCells('D2:J2');
+            wsSummary.getCell('D2').value = "Độc lập - Tự do - Hạnh phúc";
+            wsSummary.getCell('D2').font = { name: 'Times New Roman', size: 12, bold: true, underline: true };
+            wsSummary.getCell('D2').alignment = { horizontal: 'center' };
+
+            wsSummary.mergeCells('D3:J3');
+            wsSummary.getCell('D3').value = dateStr;
+            wsSummary.getCell('D3').font = { name: 'Times New Roman', size: 12, italic: true };
+            wsSummary.getCell('D3').alignment = { horizontal: 'center' };
+
+            // Tên Báo cáo
+            wsSummary.mergeCells('A5:J5');
+            wsSummary.getCell('A5').value = "BÁO CÁO THỐNG KÊ DỊCH VỤ, STEM VÀ SĨ SỐ HỌC SINH KHỐI 6";
+            wsSummary.getCell('A5').font = { name: 'Times New Roman', size: 14, bold: true };
+            wsSummary.getCell('A5').alignment = { horizontal: 'center' };
+
+            // Header Bảng
+            const summaryHeaders = ["STT", "Lớp", "Sĩ số", "Toán - Khoa", "STEM", "KNS", "IC3", "TAGT", "Hòa Nhập", "Không Ăn/Ngủ BT"];
+            const headRow1 = wsSummary.addRow(summaryHeaders);
+            headRow1.font = fontBold;
+            headRow1.height = 25;
+            headRow1.eachCell((cell) => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                cell.border = thinBorder;
+            });
+
+            // Tổng hợp dữ liệu
             const classServiceMap = {};
             let sumTotal = 0, sumToanKhoa = 0, sumStem = 0, sumKns = 0, sumIc3 = 0, sumTagt = 0, sumHoaNhap = 0, sumKhongAnNgu = 0;
 
             studentsData.forEach(s => {
                 const c = s.lop || 'Chưa xếp';
                 if (!classServiceMap[c]) classServiceMap[c] = { total: 0, toanKhoa: 0, stem: 0, kns: 0, ic3: 0, tagt: 0, hoaNhap: 0, khongAnNgu: 0 };
-                
                 classServiceMap[c].total++; sumTotal++;
                 if (s.toanKhoa === 'x') { classServiceMap[c].toanKhoa++; sumToanKhoa++; }
                 if (s.stem === 'x') { classServiceMap[c].stem++; sumStem++; }
@@ -706,95 +831,147 @@
                 if (s.khongAnNgu) { classServiceMap[c].khongAnNgu++; sumKhongAnNgu++; }
             });
 
-            const sheet1Rows = [
-                ["UBND PHƯỜNG HẠNH THÔNG", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
-                ["TRƯỜNG THCS ...", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
-                ["", "", "", "", dateStr],
-                [""],
-                ["BÁO CÁO THỐNG KÊ DỊCH VỤ, STEM VÀ SĨ SỐ HỌC SINH KHỐI 6"],
-                [""],
-                ["STT", "Lớp", "Sĩ số", "Toán - Khoa", "STEM", "KNS", "IC3", "TAGT", "Hòa Nhập", "Không Ăn/Ngủ BT"]
-            ];
-
-            let sttCount = 1;
+            let sttIdx = 1;
             Object.keys(classServiceMap).sort().forEach(cName => {
                 const d = classServiceMap[cName];
-                sheet1Rows.push([
-                    sttCount++,
-                    cName,
-                    d.total,
-                    d.toanKhoa,
-                    d.stem,
-                    d.kns,
-                    d.ic3,
-                    d.tagt,
-                    d.hoaNhap,
-                    d.khongAnNgu
+                const row = wsSummary.addRow([
+                    sttIdx++, cName, d.total, d.toanKhoa, d.stem, d.kns, d.ic3, d.tagt, d.hoaNhap, d.khongAnNgu
                 ]);
+                row.font = fontBody;
+                row.height = 20;
+                row.eachCell((cell) => {
+                    cell.border = thinBorder;
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                });
             });
 
-            sheet1Rows.push(["", "TỔNG CỘNG", sumTotal, sumToanKhoa, sumStem, sumKns, sumIc3, sumTagt, sumHoaNhap, sumKhongAnNgu]);
-
-            const ws1 = XLSX.utils.aoa_to_sheet(sheet1Rows);
-
-            // --- SHEET 2: DANH SÁCH CHI TIẾT HỌC SINH ---
-            const sheet2Rows = [
-                ["UBND PHƯỜNG HẠNH THÔNG", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
-                ["TRƯỜNG THCS ...", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
-                ["", "", "", "", dateStr],
-                [""],
-                ["DANH SÁCH CHI TIẾT HỌC SINH ĐĂNG KÝ DỊCH VỤ KHỐI 6"],
-                [""],
-                ["STT", "Họ và Tên", "Giới tính", "Ngày sinh", "Lớp", "Loại hình lớp", "Toán - Khoa", "KNS", "STEM", "TAGT", "IC3", "Ghi chú"]
-            ];
-
-            studentsData.forEach((s, i) => {
-                sheet2Rows.push([
-                    i + 1,
-                    s.hoTen,
-                    s.gioiTinh,
-                    s.ngaySinh,
-                    s.lop,
-                    s.loaiHinh,
-                    s.toanKhoa,
-                    s.kns,
-                    s.stem,
-                    s.tagt,
-                    s.ic3,
-                    s.ghiChu
-                ]);
+            // Dòng Tổng Cộng
+            const sumRow = wsSummary.addRow(["", "TỔNG CỘNG", sumTotal, sumToanKhoa, sumStem, sumKns, sumIc3, sumTagt, sumHoaNhap, sumKhongAnNgu]);
+            sumRow.font = fontBold;
+            sumRow.height = 22;
+            sumRow.eachCell((cell) => {
+                cell.border = thinBorder;
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
             });
 
-            const ws2 = XLSX.utils.aoa_to_sheet(sheet2Rows);
-
-            // Cấu hình Căn Trang In A4 Đứng (Portrait) & Lề In cho CẢ 2 SHEET
-            [ws1, ws2].forEach(ws => {
-                ws['!pageSetup'] = {
-                    paperSize: 9,         // A4
-                    orientation: 'portrait', // Trang Đứng
-                    scale: 100,
-                    fitToWidth: 1,        // Căn vừa chiều ngang A4
-                    fitToHeight: 0
-                };
-                ws['!margins'] = { left: 0.5, right: 0.5, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+            // === 3.2 TẠO CÁC SHEET TỪNG LỚP RIÊNG BỆNH (ĐÃ SẮP XẾP TÊN -> HỌ ABC) ===
+            const classGroups = {};
+            studentsData.forEach(s => {
+                const cName = s.lop || 'Chưa_xếp';
+                if (!classGroups[cName]) classGroups[cName] = [];
+                classGroups[cName].push(s);
             });
 
-            // Chỉnh độ rộng cột Sheet 1
-            ws1['!cols'] = [
-                { wch: 5 }, { wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 16 }
-            ];
+            Object.keys(classGroups).sort().forEach(cName => {
+                // SẮP XẾP HỌC SINH LỚP NÀY THEO TÊN -> HỌ (ABC TIẾNG VIỆT)
+                classGroups[cName].sort((a, b) => {
+                    const cmpFirstName = a.firstName.localeCompare(b.firstName, 'vi', { sensitivity: 'base' });
+                    if (cmpFirstName !== 0) return cmpFirstName;
+                    return a.lastName.localeCompare(b.lastName, 'vi', { sensitivity: 'base' });
+                });
 
-            // Chỉnh độ rộng cột Sheet 2
-            ws2['!cols'] = [
-                { wch: 5 }, { wch: 22 }, { wch: 9 }, { wch: 12 }, { wch: 8 }, { wch: 14 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 25 }
-            ];
+                // Đặt tên sheet an toàn
+                const sheetName = `Lop_${cName.replace(/[^a-zA-Z0-9]/g, '_')}`.substring(0, 31);
+                const wsClass = workbook.addWorksheet(sheetName);
+                setupSheetA4(wsClass);
 
-            // Thêm các Sheet vào Workbook
-            XLSX.utils.book_append_sheet(wb, ws1, "Thong_Ke_Tong_Hop");
-            XLSX.utils.book_append_sheet(wb, ws2, "Danh_Sach_Chi_Tiet");
+                // Độ rộng cột Sheet Lớp
+                wsClass.columns = [
+                    { width: 6 },  // A: STT
+                    { width: 22 }, // B: Họ và tên
+                    { width: 10 }, // C: Giới tính
+                    { width: 14 }, // D: Ngày sinh
+                    { width: 8 },  // E: Lớp
+                    { width: 14 }, // F: Loại hình
+                    { width: 12 }, // G: Toán - Khoa
+                    { width: 8 },  // H: KNS
+                    { width: 8 },  // I: STEM
+                    { width: 8 },  // J: TAGT
+                    { width: 8 },  // K: IC3
+                    { width: 25 }  // L: Ghi chú
+                ];
 
-            // Xuất File Excel
-            XLSX.writeFile(wb, "Bao_Cao_Thong_Ke_Khoi_6_A4.xlsx");
+                // Header Hành chính - Góc trái
+                wsClass.mergeCells('A1:D1');
+                wsClass.getCell('A1').value = "UBND PHƯỜNG HẠNH THÔNG";
+                wsClass.getCell('A1').font = fontHeaderLeftNormal;
+                wsClass.getCell('A1').alignment = { horizontal: 'center' };
+
+                wsClass.mergeCells('A2:D2');
+                wsClass.getCell('A2').value = "TRƯỜNG THCS GÒ VẤP";
+                wsClass.getCell('A2').font = fontHeaderLeftBold;
+                wsClass.getCell('A2').alignment = { horizontal: 'center' };
+
+                // Header Hành chính - Góc Phải
+                wsClass.mergeCells('E1:L1');
+                wsClass.getCell('E1').value = "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM";
+                wsClass.getCell('E1').font = fontBold;
+                wsClass.getCell('E1').alignment = { horizontal: 'center' };
+
+                wsClass.mergeCells('E2:L2');
+                wsClass.getCell('E2').value = "Độc lập - Tự do - Hạnh phúc";
+                wsClass.getCell('E2').font = { name: 'Times New Roman', size: 12, bold: true, underline: true };
+                wsClass.getCell('E2').alignment = { horizontal: 'center' };
+
+                wsClass.mergeCells('E3:L3');
+                wsClass.getCell('E3').value = dateStr;
+                wsClass.getCell('E3').font = { name: 'Times New Roman', size: 12, italic: true };
+                wsClass.getCell('E3').alignment = { horizontal: 'center' };
+
+                // Tên Tiêu đề Lớp
+                wsClass.mergeCells('A5:L5');
+                wsClass.getCell('A5').value = `DANH SÁCH HỌC SINH LỚP ${cName.toUpperCase()}`;
+                wsClass.getCell('A5').font = { name: 'Times New Roman', size: 14, bold: true };
+                wsClass.getCell('A5').alignment = { horizontal: 'center' };
+
+                // Headers Bảng Lớp
+                const detailHeaders = ["STT", "Họ và Tên", "Giới tính", "Ngày sinh", "Lớp", "Loại hình", "Toán - Khoa", "KNS", "STEM", "TAGT", "IC3", "Ghi chú"];
+                const headRowClass = wsClass.addRow(detailHeaders);
+                headRowClass.font = fontBold;
+                headRowClass.height = 25;
+                headRowClass.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                    cell.border = thinBorder;
+                });
+
+                // Dữ liệu học sinh (Đã được sắp xếp Tên -> Họ ABC)
+                classGroups[cName].forEach((s, idx) => {
+                    const row = wsClass.addRow([
+                        idx + 1,
+                        s.hoTen,
+                        s.gioiTinh,
+                        s.ngaySinh,
+                        s.lop,
+                        s.loaiHinh,
+                        s.toanKhoa,
+                        s.kns,
+                        s.stem,
+                        s.tagt,
+                        s.ic3,
+                        s.ghiChu
+                    ]);
+                    row.font = fontBody;
+                    row.height = 20;
+
+                    row.eachCell((cell, colIndex) => {
+                        cell.border = thinBorder;
+                        cell.alignment = { vertical: 'middle' };
+
+                        // Căn giữa cho STT, Giới tính, Ngày sinh, Lớp, Các ô x dịch vụ
+                        if ([1, 3, 4, 5, 7, 8, 9, 10, 11].includes(colIndex)) {
+                            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        } else {
+                            cell.alignment = { horizontal: 'left', vertical: 'middle' };
+                        }
+                    });
+                });
+            });
+
+            // Xuất ra file Excel
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(new Blob([buffer]), "Bao_Cao_Thong_Ke_Hoc_Sinh_Khoi_6_A4.xlsx");
         }
     </script>
 </body>
