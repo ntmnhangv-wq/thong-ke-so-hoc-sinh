@@ -140,8 +140,8 @@
                     <i class="fa-solid fa-bed text-amber-600 bg-amber-50 p-2 rounded-xl text-xs"></i>
                 </div>
                 <div class="mt-3">
-                    <span id="kpi-no-eat-sleep" class="text-xl font-black text-amber-600">0 / 0</span>
-                    <span class="text-[11px] text-amber-600 font-bold block">Không ăn / Không ngủ</span>
+                    <span id="kpi-no-eat-sleep" class="text-2xl font-black text-amber-600">0</span>
+                    <span class="text-[11px] text-amber-600 font-bold block">HS Không ăn ngủ BT</span>
                 </div>
             </div>
 
@@ -195,6 +195,8 @@
                         </thead>
                         <tbody id="summary-table-body" class="divide-y divide-slate-100 font-medium">
                         </tbody>
+                        <tfoot id="summary-table-foot" class="bg-slate-200/80 font-bold text-slate-900 sticky bottom-0 z-10 border-t-2 border-slate-300">
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -315,8 +317,7 @@
                             kns: String(r['Kỹ năng sống'] || '').toLowerCase().includes('x') ? 'x' : '',
                             stem: String(r['Giáo dục Stem'] || '').toLowerCase().includes('x') ? 'x' : '',
                             hoaNhap: hoaNhap,
-                            khongAn: khongAn,
-                            khongNgu: khongNgu,
+                            khongAnNgu: khongAn || khongNgu, // Đếm chung HS không ăn/ngủ BT
                             ghiChu: ghiChuFull || 'Không'
                         });
                     });
@@ -355,8 +356,7 @@
             const khongbantru = total - bantru;
             
             const countHoaNhap = studentsData.filter(s => s.hoaNhap).length;
-            const countKhongAn = studentsData.filter(s => s.khongAn).length;
-            const countKhongNgu = studentsData.filter(s => s.khongNgu).length;
+            const countKhongAnNgu = studentsData.filter(s => s.khongAnNgu).length;
 
             document.getElementById('kpi-total').innerText = total;
             document.getElementById('kpi-gender').innerText = `${nam} / ${nu}`;
@@ -366,7 +366,7 @@
             document.getElementById('kpi-khongbantru').innerText = khongbantru;
             document.getElementById('kpi-khongbantru-sub').innerText = `${((khongbantru/total)*100).toFixed(1)}% Ngoại trú`;
             document.getElementById('kpi-hoanhap').innerText = countHoaNhap;
-            document.getElementById('kpi-no-eat-sleep').innerText = `${countKhongAn} / ${countKhongNgu}`;
+            document.getElementById('kpi-no-eat-sleep').innerText = countKhongAnNgu;
         }
 
         function switchView(viewName) {
@@ -387,6 +387,7 @@
         function renderMainView() {
             const head = document.getElementById('summary-table-head');
             const body = document.getElementById('summary-table-body');
+            const foot = document.getElementById('summary-table-foot');
             const title = document.getElementById('summary-table-title');
 
             if (currentView === 'view-class') {
@@ -403,12 +404,22 @@
                 `;
 
                 const classMap = {};
+                let sumTotal = 0, sumNam = 0, sumNu = 0, sumBantru = 0, sumKhongbantru = 0;
+
                 studentsData.forEach(s => {
                     const c = s.lop || 'Chưa xếp';
                     if (!classMap[c]) classMap[c] = { total: 0, nam: 0, nu: 0, bantru: 0, khongbantru: 0 };
                     classMap[c].total++;
-                    if (s.gioiTinh === 'Nam') classMap[c].nam++; else classMap[c].nu++;
-                    if (s.loaiHinh.toLowerCase().includes('bán trú') && !s.loaiHinh.toLowerCase().includes('không')) classMap[c].bantru++; else classMap[c].khongbantru++;
+                    sumTotal++;
+
+                    if (s.gioiTinh === 'Nam') { classMap[c].nam++; sumNam++; } 
+                    else { classMap[c].nu++; sumNu++; }
+
+                    if (s.loaiHinh.toLowerCase().includes('bán trú') && !s.loaiHinh.toLowerCase().includes('không')) {
+                        classMap[c].bantru++; sumBantru++;
+                    } else {
+                        classMap[c].khongbantru++; sumKhongbantru++;
+                    }
                 });
 
                 let html = '';
@@ -433,6 +444,19 @@
                 });
 
                 body.innerHTML = html;
+
+                // Dòng TỔNG CỘNG
+                foot.innerHTML = `
+                    <tr>
+                        <td class="p-2.5 text-blue-950 uppercase font-black">TỔNG CỘNG</td>
+                        <td class="p-2.5 text-slate-900 font-black text-sm">${sumTotal}</td>
+                        <td class="p-2.5 text-blue-700 font-black">${sumNam}</td>
+                        <td class="p-2.5 text-pink-700 font-black">${sumNu}</td>
+                        <td class="p-2.5 text-emerald-700 font-black">${sumBantru}</td>
+                        <td class="p-2.5 text-orange-700 font-black">${sumKhongbantru}</td>
+                    </tr>
+                `;
+
                 renderChart('bar', labels, totals, 'Sĩ số học sinh theo từng LỚP', '#1e3a8a');
 
             } else if (currentView === 'view-services') {
@@ -452,18 +476,20 @@
                 `;
 
                 const classServiceMap = {};
+                let sumTotal = 0, sumToanKhoa = 0, sumStem = 0, sumKns = 0, sumIc3 = 0, sumTagt = 0, sumHoaNhap = 0, sumKhongAnNgu = 0;
+
                 studentsData.forEach(s => {
                     const c = s.lop || 'Chưa xếp';
-                    if (!classServiceMap[c]) classServiceMap[c] = { total: 0, toanKhoa: 0, stem: 0, kns: 0, ic3: 0, tagt: 0, hoaNhap: 0, khongAn: 0, khongNgu: 0 };
-                    classServiceMap[c].total++;
-                    if (s.toanKhoa === 'x') classServiceMap[c].toanKhoa++;
-                    if (s.stem === 'x') classServiceMap[c].stem++;
-                    if (s.kns === 'x') classServiceMap[c].kns++;
-                    if (s.ic3 === 'x') classServiceMap[c].ic3++;
-                    if (s.tagt === 'x') classServiceMap[c].tagt++;
-                    if (s.hoaNhap) classServiceMap[c].hoaNhap++;
-                    if (s.khongAn) classServiceMap[c].khongAn++;
-                    if (s.khongNgu) classServiceMap[c].khongNgu++;
+                    if (!classServiceMap[c]) classServiceMap[c] = { total: 0, toanKhoa: 0, stem: 0, kns: 0, ic3: 0, tagt: 0, hoaNhap: 0, khongAnNgu: 0 };
+                    
+                    classServiceMap[c].total++; sumTotal++;
+                    if (s.toanKhoa === 'x') { classServiceMap[c].toanKhoa++; sumToanKhoa++; }
+                    if (s.stem === 'x') { classServiceMap[c].stem++; sumStem++; }
+                    if (s.kns === 'x') { classServiceMap[c].kns++; sumKns++; }
+                    if (s.ic3 === 'x') { classServiceMap[c].ic3++; sumIc3++; }
+                    if (s.tagt === 'x') { classServiceMap[c].tagt++; sumTagt++; }
+                    if (s.hoaNhap) { classServiceMap[c].hoaNhap++; sumHoaNhap++; }
+                    if (s.khongAnNgu) { classServiceMap[c].khongAnNgu++; sumKhongAnNgu++; }
                 });
 
                 let html = '';
@@ -484,15 +510,30 @@
                             <td class="p-2.5 font-bold text-indigo-600">${d.kns} <span class="text-[10px] text-slate-400 font-normal">(${((d.kns/d.total)*100).toFixed(0)}%)</span></td>
                             <td class="p-2.5 font-bold text-purple-600">${d.ic3} <span class="text-[10px] text-slate-400 font-normal">(${((d.ic3/d.total)*100).toFixed(0)}%)</span></td>
                             <td class="p-2.5 font-bold text-amber-600">${d.tagt} <span class="text-[10px] text-slate-400 font-normal">(${((d.tagt/d.total)*100).toFixed(0)}%)</span></td>
-                            
-                            <!-- Bổ sung 2 cột theo từng lớp -->
                             <td class="p-2.5 font-bold text-rose-600 bg-rose-50/50">${d.hoaNhap > 0 ? d.hoaNhap : '-'}</td>
-                            <td class="p-2.5 font-bold text-orange-600 bg-orange-50/50">${(d.khongAn > 0 || d.khongNgu > 0) ? `${d.khongAn} ăn / ${d.khongNgu} ngủ` : '-'}</td>
+                            <!-- Bỏ hoàn toàn dấu / và chữ ăn/ngủ, chỉ hiển thị số lượng cụ thể -->
+                            <td class="p-2.5 font-bold text-orange-600 bg-orange-50/50">${d.khongAnNgu > 0 ? d.khongAnNgu : '-'}</td>
                         </tr>
                     `;
                 });
 
                 body.innerHTML = html;
+
+                // Dòng TỔNG CỘNG
+                foot.innerHTML = `
+                    <tr>
+                        <td class="p-2.5 text-blue-950 uppercase font-black">TỔNG CỘNG</td>
+                        <td class="p-2.5 text-slate-900 font-black text-sm">${sumTotal}</td>
+                        <td class="p-2.5 text-emerald-700 font-black">${sumToanKhoa} <span class="text-[10px] text-slate-500 font-normal">(${sumTotal ? ((sumToanKhoa/sumTotal)*100).toFixed(0) : 0}%)</span></td>
+                        <td class="p-2.5 text-teal-700 font-black">${sumStem} <span class="text-[10px] text-slate-500 font-normal">(${sumTotal ? ((sumStem/sumTotal)*100).toFixed(0) : 0}%)</span></td>
+                        <td class="p-2.5 text-indigo-700 font-black">${sumKns} <span class="text-[10px] text-slate-500 font-normal">(${sumTotal ? ((sumKns/sumTotal)*100).toFixed(0) : 0}%)</span></td>
+                        <td class="p-2.5 text-purple-700 font-black">${sumIc3} <span class="text-[10px] text-slate-500 font-normal">(${sumTotal ? ((sumIc3/sumTotal)*100).toFixed(0) : 0}%)</span></td>
+                        <td class="p-2.5 text-amber-700 font-black">${sumTagt} <span class="text-[10px] text-slate-500 font-normal">(${sumTotal ? ((sumTagt/sumTotal)*100).toFixed(0) : 0}%)</span></td>
+                        <td class="p-2.5 text-rose-700 font-black bg-rose-100/60">${sumHoaNhap}</td>
+                        <td class="p-2.5 text-orange-700 font-black bg-orange-100/60">${sumKhongAnNgu}</td>
+                    </tr>
+                `;
+
                 renderChart('bar', labels, stemCounts, 'Số HS đăng ký STEM theo từng Lớp', '#0d9488');
             }
         }
@@ -543,7 +584,7 @@
             }
 
             tbody.innerHTML = filteredStudents.map(s => {
-                const isSpecial = s.hoaNhap || s.khongAn || s.khongNgu;
+                const isSpecial = s.hoaNhap || s.khongAnNgu;
                 
                 return `
                     <tr class="hover:bg-blue-50/40 transition ${isSpecial ? 'bg-amber-50/60' : ''}">
