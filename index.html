@@ -39,7 +39,7 @@
                         THỐNG KÊ HỌC SINH KHỐI 6
                         <span class="bg-blue-500/30 text-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-400/30">Hệ Thống Online</span>
                     </h1>
-                    <p class="text-xs text-slate-300 font-medium">Báo cáo chi tiết Dịch vụ, STEM theo từng Lớp & Học sinh đặc biệt</p>
+                    <p class="text-xs text-slate-300 font-medium">Báo cáo Dịch vụ, STEM, HS Hòa Nhập & Không Ăn/Ngủ Theo Từng Lớp</p>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
             </div>
             <div>
                 <h3 class="font-bold text-slate-800 text-base">Tải Lên File Excel Xếp Lớp Khối 6</h3>
-                <p class="text-xs text-slate-500 max-w-xl mt-1">Hệ thống tự động phân tích Môn Dịch vụ (Toán-Khoa, STEM, KNS, IC3, TAGT) chi tiết cho TỪNG LỚP, Học sinh Hòa nhập và Học sinh Không đăng ký Ăn/Ngủ từ ghi chú.</p>
+                <p class="text-xs text-slate-500 max-w-xl mt-1">Hệ thống tự động phân tích Môn Dịch vụ (Toán-Khoa, STEM, KNS, IC3, TAGT), HS Hòa Nhập và Không Ăn/Ngủ chi tiết cho TỪNG LỚP.</p>
             </div>
             <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer shadow transition">
                 <i class="fa-solid fa-folder-open mr-2"></i> Chọn File Excel
@@ -130,7 +130,7 @@
                 </div>
                 <div class="mt-3">
                     <span id="kpi-hoanhap" class="text-2xl font-black text-rose-600">0</span>
-                    <span class="text-[11px] text-rose-600 font-bold block">Theo ghi chú</span>
+                    <span class="text-[11px] text-rose-600 font-bold block">Toàn khối</span>
                 </div>
             </div>
 
@@ -153,15 +153,11 @@
                 <span class="text-xs font-bold text-slate-400 uppercase px-2">Chế độ xem:</span>
                 
                 <button onclick="switchView('view-class')" id="btn-view-class" class="tab-btn active px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 transition flex items-center">
-                    <i class="fa-solid fa-sitemap mr-2"></i> Thống kê theo LỚP
+                    <i class="fa-solid fa-sitemap mr-2"></i> Thống kê Sĩ số theo LỚP
                 </button>
 
                 <button onclick="switchView('view-services')" id="btn-view-services" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 transition flex items-center">
-                    <i class="fa-solid fa-layer-group mr-2"></i> Thống kê DỊCH VỤ theo TỪNG LỚP
-                </button>
-
-                <button onclick="switchView('view-special')" id="btn-view-special" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 transition flex items-center">
-                    <i class="fa-solid fa-heart-pulse mr-2 text-rose-500"></i> Hòa Nhập & Không Ăn/Ngủ
+                    <i class="fa-solid fa-layer-group mr-2"></i> Dịch Vụ, STEM & HS Đặc Biệt Theo TỪNG LỚP
                 </button>
             </div>
 
@@ -174,28 +170,28 @@
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <!-- CHART -->
-            <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center">
                         <i class="fa-solid fa-chart-pie text-indigo-600 mr-2"></i> Biểu Đồ Trực Quan
                     </h3>
                 </div>
-                <div class="h-64 relative flex items-center justify-center">
+                <div class="h-72 relative flex items-center justify-center">
                     <canvas id="mainChart"></canvas>
                 </div>
             </div>
 
             <!-- TABLE -->
-            <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <div class="lg:col-span-8 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-center mb-3">
                     <h3 id="summary-table-title" class="font-bold text-slate-800 text-sm flex items-center">
                         <i class="fa-solid fa-list-ol text-blue-600 mr-2"></i> Báo Cáo Chi Tiết
                     </h3>
                 </div>
 
-                <div class="overflow-x-auto custom-scrollbar flex-grow max-h-[320px]">
+                <div class="overflow-x-auto custom-scrollbar flex-grow max-h-[350px]">
                     <table class="w-full text-left border-collapse text-xs">
-                        <thead id="summary-table-head" class="bg-slate-100 text-slate-600 uppercase font-bold text-[10px] sticky top-0">
+                        <thead id="summary-table-head" class="bg-slate-100 text-slate-600 uppercase font-bold text-[10px] sticky top-0 z-10 shadow-sm">
                         </thead>
                         <tbody id="summary-table-body" class="divide-y divide-slate-100 font-medium">
                         </tbody>
@@ -212,8 +208,8 @@
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-id-card text-blue-700 text-base"></i>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm">Danh Sách Học Sinh Sheet "Xep lop"</h3>
-                        <p class="text-[11px] text-slate-500">Tra cứu chi tiết từng học sinh và dịch vụ đăng ký</p>
+                        <h3 class="font-bold text-slate-800 text-sm">Danh Sách Tra Cứu Học Sinh Sheet "Xep lop"</h3>
+                        <p class="text-[11px] text-slate-500">Tra cứu thông tin chi tiết từng học sinh</p>
                     </div>
                 </div>
 
@@ -382,10 +378,7 @@
                 document.getElementById('current-view-title').innerText = 'Thống kê sĩ số theo LỚP';
             } else if (viewName === 'view-services') {
                 document.getElementById('btn-view-services').classList.add('active');
-                document.getElementById('current-view-title').innerText = 'Thống kê Dịch Vụ & STEM theo TỪNG LỚP';
-            } else if (viewName === 'view-special') {
-                document.getElementById('btn-view-special').classList.add('active');
-                document.getElementById('current-view-title').innerText = 'HS Hòa Nhập & Không Ăn/Ngủ';
+                document.getElementById('current-view-title').innerText = 'Thống kê Dịch Vụ, STEM, Hòa Nhập & Không Ăn/Ngủ Theo TỪNG LỚP';
             }
 
             renderMainView();
@@ -443,7 +436,7 @@
                 renderChart('bar', labels, totals, 'Sĩ số học sinh theo từng LỚP', '#1e3a8a');
 
             } else if (currentView === 'view-services') {
-                title.innerHTML = `<i class="fa-solid fa-layer-group text-indigo-600 mr-2"></i> Báo Cáo Môn Dịch Vụ Chi Tiết Theo TỪNG LỚP`;
+                title.innerHTML = `<i class="fa-solid fa-layer-group text-indigo-600 mr-2"></i> Báo Cáo Dịch Vụ, STEM, Hòa Nhập & Không Ăn/Ngủ Theo TỪNG LỚP`;
                 head.innerHTML = `
                     <tr>
                         <th class="p-2.5">LỚP</th>
@@ -453,19 +446,24 @@
                         <th class="p-2.5 text-indigo-700">KNS</th>
                         <th class="p-2.5 text-purple-700">IC3</th>
                         <th class="p-2.5 text-amber-700">TAGT</th>
+                        <th class="p-2.5 text-rose-700 bg-rose-50">Hòa Nhập</th>
+                        <th class="p-2.5 text-orange-700 bg-orange-50">Không Ăn / Ngủ</th>
                     </tr>
                 `;
 
                 const classServiceMap = {};
                 studentsData.forEach(s => {
                     const c = s.lop || 'Chưa xếp';
-                    if (!classServiceMap[c]) classServiceMap[c] = { total: 0, toanKhoa: 0, stem: 0, kns: 0, ic3: 0, tagt: 0 };
+                    if (!classServiceMap[c]) classServiceMap[c] = { total: 0, toanKhoa: 0, stem: 0, kns: 0, ic3: 0, tagt: 0, hoaNhap: 0, khongAn: 0, khongNgu: 0 };
                     classServiceMap[c].total++;
                     if (s.toanKhoa === 'x') classServiceMap[c].toanKhoa++;
                     if (s.stem === 'x') classServiceMap[c].stem++;
                     if (s.kns === 'x') classServiceMap[c].kns++;
                     if (s.ic3 === 'x') classServiceMap[c].ic3++;
                     if (s.tagt === 'x') classServiceMap[c].tagt++;
+                    if (s.hoaNhap) classServiceMap[c].hoaNhap++;
+                    if (s.khongAn) classServiceMap[c].khongAn++;
+                    if (s.khongNgu) classServiceMap[c].khongNgu++;
                 });
 
                 let html = '';
@@ -486,46 +484,16 @@
                             <td class="p-2.5 font-bold text-indigo-600">${d.kns} <span class="text-[10px] text-slate-400 font-normal">(${((d.kns/d.total)*100).toFixed(0)}%)</span></td>
                             <td class="p-2.5 font-bold text-purple-600">${d.ic3} <span class="text-[10px] text-slate-400 font-normal">(${((d.ic3/d.total)*100).toFixed(0)}%)</span></td>
                             <td class="p-2.5 font-bold text-amber-600">${d.tagt} <span class="text-[10px] text-slate-400 font-normal">(${((d.tagt/d.total)*100).toFixed(0)}%)</span></td>
+                            
+                            <!-- Bổ sung 2 cột theo từng lớp -->
+                            <td class="p-2.5 font-bold text-rose-600 bg-rose-50/50">${d.hoaNhap > 0 ? d.hoaNhap : '-'}</td>
+                            <td class="p-2.5 font-bold text-orange-600 bg-orange-50/50">${(d.khongAn > 0 || d.khongNgu > 0) ? `${d.khongAn} ăn / ${d.khongNgu} ngủ` : '-'}</td>
                         </tr>
                     `;
                 });
 
                 body.innerHTML = html;
                 renderChart('bar', labels, stemCounts, 'Số HS đăng ký STEM theo từng Lớp', '#0d9488');
-
-            } else if (currentView === 'view-special') {
-                title.innerHTML = `<i class="fa-solid fa-heart-pulse text-rose-600 mr-2"></i> Thống Kê HS Hòa Nhập & Không Đăng Ký Ăn/Ngủ`;
-                head.innerHTML = `
-                    <tr>
-                        <th class="p-2.5">Loại Hình Theo Ghi Chú</th>
-                        <th class="p-2.5">Số Lượng HS</th>
-                        <th class="p-2.5">Ghi Chú Chi Tiết</th>
-                    </tr>
-                `;
-
-                const countHoaNhap = studentsData.filter(s => s.hoaNhap).length;
-                const countKhongAn = studentsData.filter(s => s.khongAn).length;
-                const countKhongNgu = studentsData.filter(s => s.khongNgu).length;
-
-                body.innerHTML = `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-2.5 font-bold text-rose-700">Học Sinh Hòa Nhập</td>
-                        <td class="p-2.5 font-black text-rose-600 text-sm">${countHoaNhap}</td>
-                        <td class="p-2.5 text-slate-500">Cần hỗ trợ đặc biệt</td>
-                    </tr>
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-2.5 font-bold text-amber-700">Không Đăng Ký Ăn</td>
-                        <td class="p-2.5 font-black text-amber-600 text-sm">${countKhongAn}</td>
-                        <td class="p-2.5 text-slate-500">Ghi nhận từ danh sách xếp lớp</td>
-                    </tr>
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-2.5 font-bold text-indigo-700">Không Đăng Ký Ngủ</td>
-                        <td class="p-2.5 font-black text-indigo-600 text-sm">${countKhongNgu}</td>
-                        <td class="p-2.5 text-slate-500">Ghi nhận từ danh sách xếp lớp</td>
-                    </tr>
-                `;
-
-                renderChart('doughnut', ['Hòa Nhập', 'Không Ăn', 'Không Ngủ'], [countHoaNhap, countKhongAn, countKhongNgu], 'Học sinh đặc biệt', ['#f43f5e', '#f59e0b', '#6366f1']);
             }
         }
 
@@ -591,6 +559,7 @@
                             ${s.kns === 'x' ? '<span class="bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded text-[10px] font-bold">KNS</span>' : ''}
                             ${s.ic3 === 'x' ? '<span class="bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded text-[10px] font-bold">IC3</span>' : ''}
                             ${s.tagt === 'x' ? '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[10px] font-bold">TAGT</span>' : ''}
+                            ${s.hoaNhap ? '<span class="bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[10px] font-bold">Hòa nhập</span>' : ''}
                         </td>
                         <td class="p-3 font-medium text-slate-600">${s.ghiChu}</td>
                     </tr>
